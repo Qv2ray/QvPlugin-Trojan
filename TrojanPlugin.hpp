@@ -11,7 +11,7 @@
 class QLabel;
 using namespace Qv2rayPlugin;
 
-class SimplePlugin
+class TrojanPlugin
     : public QObject
     , Qv2rayInterface
 {
@@ -24,17 +24,14 @@ class SimplePlugin
     const QvPluginMetadata GetMetadata() const override
     {
         return QvPluginMetadata{
-            "QvSimplePlugin",                                 //
-            "Qv2ray Workgroup",                               //
-            "qvplugin_test",                                  //
-            "QvSimplePlugin is a simple plugin for testing.", //
-            QIcon(":/qv2ray.png"),                            //
-            { CAPABILITY_CONNECTION_ENTRY,                    //
-              CAPABILITY_CONNECTIVITY,                        //
-              CAPABILITY_STATS,                               //
-              CAPABILITY_SYSTEM_PROXY },                      //
-            { SPECIAL_TYPE_KERNEL,                            //
-              SPECIAL_TYPE_SERIALIZOR }                       //
+            "Trojan Plugin",                      //
+            "Qv2ray Workgroup",                   //
+            "qvtrojan_plugin",                    //
+            "Connect to Trojan server in Qv2ray", //
+            QIcon(":/assets/logo.png"),           //
+            {},                                   //
+            { SPECIAL_TYPE_KERNEL,                //
+              SPECIAL_TYPE_SERIALIZOR }           //
         };
     }
     //
@@ -54,7 +51,7 @@ class SimplePlugin
 
   private:
     QJsonObject settings;
-    std::shared_ptr<QvPluginSerializer> serializer;
-    std::shared_ptr<QvPluginEventHandler> eventHandler;
-    std::shared_ptr<QvPluginKernel> kernel;
+    std::shared_ptr<TrojanSerializer> serializer;
+    std::shared_ptr<TrojanEventHandler> eventHandler;
+    std::shared_ptr<TrojanKernel> kernel;
 };
