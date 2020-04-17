@@ -89,6 +89,8 @@ jobs:
           CC: cl.exe
           CXX: cl.exe
         run: |
+          [[ ${{ matrix.arch }} == "x86" ]] && arg="--forcex86" || arg=""
+          choco install $arg openssl > openssl_installer.log
           mkdir build
           cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release -A ${{ matrix.cmakearch }}

@@ -14,24 +14,12 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt5 COMPONENTS Core Widgets Gui Network REQUIRED)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(Boost_USE_STATIC_LIBS ON)
-find_package(Threads REQUIRED)
-find_package(Boost 1.66.0 REQUIRED COMPONENTS system program_options)
-
-if(WIN32)
-    find_library(OpenSSL REQUIRED)
-else()
-    find_package(OpenSSL REQUIRED)
-endif()
-
-include_directories(${OPENSSL_INCLUDE_DIR})
-include_directories(${Boost_INCLUDE_DIR})
+include(cmake/trojan.cmake)
 
 set(QVPLUGIN_INTERFACE_INCLUDE_DIR "interface/")
 set(QVPLUGIN_HAS_HTTP_TO_SOCKS_HELPER ON)
 include(interface/QvPluginInterface.cmake)
 include_directories(${QVPLUGIN_INTERFACE_INCLUDE_DIR})
-
 include_directories(${CMAKE_SOURCE_DIR}/trojan/src)
 
 set(TROJAN_SOURCES
@@ -86,18 +74,11 @@ add_library(${PROJECT_NAME} MODULE
     ${TROJAN_SOURCES}
     ${TROJAN_HEADERS})
 
-if(APPLE)
-    find_library(CoreFoundation CoreFoundation)
-    find_library(Security Security)
-    target_link_libraries(${PROJECT_NAME} ${CoreFoundation} ${Security})
-elseif(WIN32)
-    target_link_libraries(${PROJECT_NAME} wsock32 ws2_32 crypt32)
-endif()
-
 target_link_libraries(${PROJECT_NAME}
     Qt5::Core
     Qt5::Gui
     Qt5::Widgets
     Qt5::Network
+    ${CMAKE_THREAD_LIBS_INIT}
     ${OPENSSL_LIBRARIES}
     ${Boost_LIBRARIES})
