@@ -64,6 +64,9 @@ add_library(${PROJECT_NAME} MODULE
     core/EventHandler.hpp
     core/Serializer.cpp
     core/Serializer.hpp
+    ui/TrojanOutboundEditor.cpp
+    ui/TrojanOutboundEditor.hpp
+    ui/TrojanOutboundEditor.ui
     core/Common.hpp
     core/Kernel.cpp
     core/Kernel.hpp

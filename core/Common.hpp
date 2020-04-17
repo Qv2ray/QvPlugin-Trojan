@@ -50,7 +50,7 @@ struct TrojanObject
     }
 #undef _X
 
-    static TrojanObject fromJson(const QJsonObject &root)
+    [[nodiscard]] static TrojanObject fromJson(const QJsonObject &root)
     {
         TrojanObject o;
         o.loadJson(root);

@@ -1,5 +1,7 @@
 #include "TrojanPlugin.hpp"
 
+#include "ui/TrojanOutboundEditor.hpp"
+
 #include <QDateTime>
 #include <QLabel>
 #include <QMetaEnum>
@@ -17,7 +19,6 @@ bool TrojanPlugin::UpdateSettings(const QJsonObject &conf)
 
 bool TrojanPlugin::Initialize(const QString &, const QJsonObject &settings)
 {
-    emit PluginLog("Initialize plugin.");
     this->settings = settings;
     serializer = std::make_shared<TrojanSerializer>(this);
     eventHandler = std::make_shared<TrojanEventHandler>(this);
@@ -37,7 +38,7 @@ std::shared_ptr<QvPluginEventHandler> TrojanPlugin::GetEventHandler()
 
 std::unique_ptr<QWidget> TrojanPlugin::GetSettingsWidget()
 {
-    return std::make_unique<QLabel>("Text!");
+    return nullptr;
 }
 
 std::unique_ptr<QvPluginEditor> TrojanPlugin::GetEditorWidget(UI_TYPE type)
@@ -45,8 +46,8 @@ std::unique_ptr<QvPluginEditor> TrojanPlugin::GetEditorWidget(UI_TYPE type)
     switch (type)
     {
         case UI_TYPE_INBOUND_EDITOR:
-        case UI_TYPE_OUTBOUND_EDITOR:
         case UI_TYPE_GROUP_EDITOR: break;
+        case UI_TYPE_OUTBOUND_EDITOR: return std::make_unique<TrojanOutboundEditor>();
     }
     return nullptr;
 }
