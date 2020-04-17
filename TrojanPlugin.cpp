@@ -38,7 +38,16 @@ std::shared_ptr<QvPluginEventHandler> TrojanPlugin::GetEventHandler()
 
 std::unique_ptr<QWidget> TrojanPlugin::GetSettingsWidget()
 {
-    return nullptr;
+    auto t = std::make_unique<QTextBrowser>();
+    t->setText("Qv2ray-Trojan plugin was ported from the Trojan-Qt5:"
+               "\r\n"
+               "Credits should also give to @TheWanderingCoel"
+               "\r\n"
+               "\r\n"
+               "Go and check more about Trojan-Qt5: "
+               "\r\n"
+               "https://github.com/TheWanderingCoel/Trojan-Qt5");
+    return t;
 }
 
 std::unique_ptr<QvPluginEditor> TrojanPlugin::GetEditorWidget(UI_TYPE type)
