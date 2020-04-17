@@ -1,4 +1,4 @@
-name: QvPlugin Build Action - cmake
+name: QvTrojanPlugin Build Action - cmake
 
 on: 
   push:
@@ -38,7 +38,7 @@ jobs:
       - name: Get Plugin Name
         id: get_name
         shell: bash
-        run: echo ::set-output name=NAME::QvSimplePlugin
+        run: echo ::set-output name=NAME::QvTrojanPlugin
       - name: Checking out sources
         uses: actions/checkout@master
       - name: Install Python 3.7 version
@@ -49,6 +49,19 @@ jobs:
       - name: Restoring submodules
         run: git submodule update --init
 # =========================================================================================================
+      - name: Install Packages
+        if: matrix.platform == 'ubuntu-16.04'
+        run: | 
+          echo "Installing boost 1_72_0...";
+          wget -O boost_1_72_0.tar.gz https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.gz/download >/dev/null 2>&1;
+          tar -xf boost_1_72_0.tar.gz;
+          cd boost_1_72_0/;
+          ./bootstrap.sh --prefix=/usr/local/boost
+          sudo ./b2 link=static cxxflags=-fPIC cflags=-fPIC --with-system --with-program_options install
+      - name: Install Packages
+        if: matrix.platform == 'macos-latest'
+        run: |
+          brew install boost openssl@1.1 zlib
       - name: Install MSVC compiler
         if: matrix.platform == 'windows-latest'
         uses: ilammy/msvc-dev-cmd@v1
@@ -87,7 +100,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DOPENSSL_LIBRARIES=/usr/local/opt/openssl@1.1/lib
           cmake --build . --parallel $(sysctl -n hw.logicalcpu)
 # --------------------------------------------------------
       - name: Linux - ${{ matrix.qt_version }} - Generate Dependencies and Build

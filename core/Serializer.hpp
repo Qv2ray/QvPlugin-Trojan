@@ -24,7 +24,7 @@ class TrojanSerializer : public Qv2rayPlugin::QvPluginSerializer
                                 ":" + QString::number(o.port) +                              //
                                 "?allowinsecure=" + QString::number(int(o.ignoreHostname)) + //
                                 "&tfo=" + QString::number(o.tcpFastOpen) +                   //
-                                "#" + alias;
+                                "#" + QUrl::toPercentEncoding(alias);
             return "trojan://" + trojanUri;
         }
         else

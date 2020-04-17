@@ -1,5 +1,7 @@
 #include "Kernel.hpp"
 
+TrojanKernelThread *TrojanKernelThread::self = nullptr;
+
 void TrojanPluginKernelLogger(const std::string &str, Log::Level)
 {
     TrojanKernelThread::self->OnKernelLogAvaliable_s(QString::fromStdString(str));
@@ -14,7 +16,7 @@ TrojanKernel::TrojanKernel(QObject *parent) : Qv2rayPlugin::QvPluginKernel(paren
 
 bool TrojanKernel::StartKernel()
 {
-    if(hasHttpConfigured)
+    if (hasHttpConfigured)
     {
         httpHelper.httpListen(QHostAddress(httpListenAddress), httpPort, socksPort);
     }
@@ -23,7 +25,8 @@ bool TrojanKernel::StartKernel()
 }
 bool TrojanKernel::StopKernel()
 {
-    if(hasHttpConfigured){
+    if (hasHttpConfigured)
+    {
         httpHelper.close();
     }
     thread.stop();
@@ -63,6 +66,10 @@ void TrojanKernelThread::stop()
         service->stop();
         wait();
     }
+}
+
+TrojanKernelThread::~TrojanKernelThread()
+{
 }
 
 void TrojanKernelThread::run()

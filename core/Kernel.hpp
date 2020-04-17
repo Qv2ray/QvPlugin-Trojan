@@ -1,8 +1,8 @@
 #pragma once
 #include "QvPluginProcessor.hpp"
-#include "utils/HttpProxy.hpp"
 #include "trojan/src/core/config.h"
 #include "trojan/src/core/service.h"
+#include "utils/HttpProxy.hpp"
 
 void TrojanPluginKernelLogger(const std::string &, Log::Level);
 
@@ -10,7 +10,10 @@ class TrojanKernelThread : public QThread
 {
     Q_OBJECT
   public:
-    TrojanKernelThread(QObject *parent = nullptr) : QThread(parent){};
+    TrojanKernelThread(QObject *parent = nullptr) : QThread(parent)
+    {
+        self = this;
+    };
     ~TrojanKernelThread();
     void stop();
     static TrojanKernelThread *self;
