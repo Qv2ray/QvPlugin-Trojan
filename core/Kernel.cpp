@@ -43,13 +43,24 @@ void TrojanKernel::SetConnectionSettings(const QString &listenAddress, const QMa
     socksPort = inbound["socks"];
     httpListenAddress = listenAddress;
     //
+    Config config;
     TrojanObject o;
     o.loadJson(settings);
+    config.run_type = Config::CLIENT;
     //
-    Config config;
-    config.populate(QJsonDocument(settings).toJson().toStdString());
+    config.password[Config::SHA224(o.password.toStdString())] = o.password.toStdString();
+    config.remote_addr = o.address.toStdString();
+    config.remote_port = o.port;
+    config.ssl.sni = o.sni.toStdString();
+    config.ssl.verify = !o.ignoreCertificate;
+    config.ssl.verify_hostname = !o.ignoreHostname;
+    config.ssl.reuse_session = o.reuseSession;
+    config.ssl.session_ticket = o.sessionTicket;
+    config.tcp.reuse_port = o.reusePort;
+    config.tcp.fast_open = o.tcpFastOpen;
+    //
     config.local_addr = listenAddress.toStdString();
-    config.local_port = 0;
+    config.local_port = socksPort;
     thread.SetConfig(config);
 }
 
@@ -60,6 +71,7 @@ const QList<Qv2rayPlugin::QvPluginOutboundProtocolObject> TrojanKernel::KernelOu
 
 TrojanKernel::~TrojanKernel()
 {
+    thread.stop();
 }
 
 // ================================================== Kernel Thread ==================================================
@@ -70,6 +82,7 @@ void TrojanKernelThread::stop()
     {
         service->stop();
         wait();
+        service.reset();
     }
 }
 
@@ -82,12 +95,14 @@ void TrojanKernelThread::run()
     try
     {
         service = std::make_unique<Service>(config);
-        service->run();
+        Log::level = Log::Level::INFO;
         Log::logger = TrojanPluginKernelLogger;
+        service->run();
     }
     catch (const std::exception &e)
     {
-        Log::log_with_date_time(std::string("fatal: ") + e.what(), Log::FATAL);
+        // Log::log_with_date_time(std::string("fatal: ") + e.what(), Log::FATAL);
         emit OnKernelCrashed_s(QString(e.what()));
+        stop();
     }
 }

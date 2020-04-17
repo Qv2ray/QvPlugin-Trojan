@@ -9,12 +9,12 @@ struct TrojanObject
     QString address;
     QString password;
     QString sni;
-    bool ignoreCertificate;
-    bool ignoreHostname;
-    bool reuseSession;
-    bool sessionTicket;
-    bool reusePort;
-    bool tcpFastOpen;
+    bool ignoreCertificate = false;
+    bool ignoreHostname = false;
+    bool reuseSession = false;
+    bool sessionTicket = false;
+    bool reusePort = false;
+    bool tcpFastOpen = false;
 
 #define _X(name) json[#name] = name
     QJsonObject toJson() const
