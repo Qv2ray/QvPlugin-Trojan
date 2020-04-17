@@ -14,8 +14,6 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt5 COMPONENTS Core Widgets Gui Network REQUIRED)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-include(cmake/trojan.cmake)
-
 set(QVPLUGIN_INTERFACE_INCLUDE_DIR "interface/")
 set(QVPLUGIN_HAS_HTTP_TO_SOCKS_HELPER ON)
 include(interface/QvPluginInterface.cmake)
@@ -73,6 +71,8 @@ add_library(${PROJECT_NAME} MODULE
     ${QVPLUGIN_INTERFACE_HEADERS}
     ${TROJAN_SOURCES}
     ${TROJAN_HEADERS})
+
+include(cmake/trojan.cmake)
 
 target_link_libraries(${PROJECT_NAME}
     Qt5::Core

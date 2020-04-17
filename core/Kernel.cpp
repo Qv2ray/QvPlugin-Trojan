@@ -1,5 +1,7 @@
 #include "Kernel.hpp"
 
+#include "Common.hpp"
+
 TrojanKernelThread *TrojanKernelThread::self = nullptr;
 
 void TrojanPluginKernelLogger(const std::string &str, Log::Level)
@@ -40,6 +42,9 @@ void TrojanKernel::SetConnectionSettings(const QString &listenAddress, const QMa
     httpPort = inbound["http"];
     socksPort = inbound["socks"];
     httpListenAddress = listenAddress;
+    //
+    TrojanObject o;
+    o.loadJson(settings);
     //
     Config config;
     config.populate(QJsonDocument(settings).toJson().toStdString());
