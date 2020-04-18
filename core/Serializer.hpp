@@ -19,12 +19,15 @@ class TrojanSerializer : public Qv2rayPlugin::QvPluginSerializer
         {
             Q_UNUSED(groupName)
             TrojanObject o = TrojanObject::fromJson(object);
-            QString trojanUri = o.password.toLocal8Bit().toPercentEncoding() +               //
-                                "@" + o.address +                                            //
-                                ":" + QString::number(o.port) +                              //
-                                "?allowinsecure=" + QString::number(int(o.ignoreHostname)) + //
-                                "&tfo=" + QString::number(o.tcpFastOpen) +                   //
-                                "#" + QUrl::toPercentEncoding(alias);
+            QString trojanUri = o.password.toLocal8Bit().toPercentEncoding() +                                      //
+                                "@" + o.address +                                                                   //
+                                ":" + QString::number(o.port) +                                                     //
+                                "?allowInsecure=" + QString::number(int(o.ignoreHostname || o.ignoreCertificate)) + //
+                                "&allowInsecureHostname=" + QString::number(int(o.ignoreHostname)) +                //
+                                "&allowInsecureCertificate=" + QString::number(int(o.ignoreCertificate)) +          //
+                                "&sessionTicket=" + QString::number(int(o.sessionTicket)) +                         //
+                                "&tfo=" + QString::number(o.tcpFastOpen) +                                          //
+                                "#" + QUrl::toPercentEncoding(alias.toUtf8());
             return "trojan://" + trojanUri;
         }
         else
@@ -34,69 +37,31 @@ class TrojanSerializer : public Qv2rayPlugin::QvPluginSerializer
     }
     const QPair<QString, QJsonObject> DeserializeOutbound(const QString &link, QString *alias, QString *errorMessage) const override
     {
-        auto trojanUri = link.toStdString();
-        std::string prefix = "trojan://";
-
-        if (trojanUri.length() < 9)
-        {
-            *errorMessage = ("Trojan URI is too short");
-            return {};
-        }
-
-        // prevent line separator casuing wrong password.
-        if (!QString::fromStdString(trojanUri).startsWith("trojan://"))
+        const QString prefix = "trojan://";
+        if (!link.startsWith(prefix))
         {
             *errorMessage = ("Invalid Trojan URI");
             return {};
         }
-
+        //
+        const auto trueList = QStringList{ "true", "1", "yes", "y" };
+        const QUrl trojanUrl(link);
+        const QUrlQuery query(trojanUrl.query());
+        *alias = trojanUrl.fragment();
+        //
         TrojanObject result;
-
-        // remove the prefix "trojan://" from uri
-        std::string uri(trojanUri.data() + 9, trojanUri.length() - 9);
-        size_t hashPos = uri.find_last_of('#');
-        if (hashPos != std::string::npos)
-        {
-            // Get the name/remark
-            *alias = QUrl::fromPercentEncoding(QString::fromStdString(uri.substr(hashPos + 1)).toLocal8Bit().data());
-            uri.erase(hashPos);
-        }
-
-        size_t atPos = uri.find_first_of('@');
-        if (atPos != std::string::npos)
-        {
-            result.password = QUrl::fromPercentEncoding(QString::fromStdString(uri.substr(0, atPos)).toLocal8Bit().data());
-            uri.erase(0, atPos + 1);
-            size_t colonPos = uri.find_last_of(':');
-            if (colonPos == std::string::npos)
-            {
-                *errorMessage = ("Can't find the colon separator between hostname and port");
-                return {};
-            }
-            result.address = QString::fromStdString(uri.substr(0, colonPos));
-            result.port = std::stoi(uri.substr(colonPos + 1));
-            uri.erase(0, colonPos + 4);
-        }
-        else
-        {
-            *errorMessage = ("Can't find the at separator between password and hostname");
-            return {};
-        }
-
-        size_t ampersandPos = uri.find_first_of('&');
-        if (ampersandPos != std::string::npos)
-        {
-            result.tcpFastOpen = std::stoi(uri.substr(ampersandPos + 5));
-            uri.erase(ampersandPos, ampersandPos + 6);
-        }
-
-        size_t questionMarkPos = uri.find_last_of('?');
-        if (questionMarkPos != std::string::npos)
-        {
-            result.ignoreHostname = std::stoi(uri.substr(questionMarkPos + 15));
-            result.ignoreCertificate = result.ignoreHostname;
-        }
-
+        result.address = trojanUrl.host();
+        result.password = trojanUrl.userName();
+        result.port = trojanUrl.port();
+        result.sni = query.queryItemValue("sni");
+        //
+        result.tcpFastOpen = trueList.contains(query.queryItemValue("tfo").toLower());
+        result.sessionTicket = trueList.contains(query.queryItemValue("sessionTicket").toLower());
+        //
+        bool allowAllInsecure = trueList.contains(query.queryItemValue("allowInsecure").toLower());
+        result.ignoreHostname = allowAllInsecure || trueList.contains(query.queryItemValue("allowInsecureHostname").toLower());
+        result.ignoreCertificate = allowAllInsecure || trueList.contains(query.queryItemValue("allowInsecureCertificate").toLower());
+        //
         return { "trojan", result.toJson() };
     }
     const Qv2rayPlugin::QvPluginOutboundInfoObject GetOutboundInfo(const QString &protocol, const QJsonObject &outbound) const override
