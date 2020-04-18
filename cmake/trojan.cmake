@@ -2,8 +2,6 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 set(ENABLE_MYSQL OFF)
 
 add_definitions(-D_WIN32_WINNT=_WIN32_WINNT_WIN8)
-set(Boost_USE_STATIC_LIBS ON)
-set(OPENSSL_USE_STATIC_LIBS TRUE)
 find_package(Threads REQUIRED)
 find_package(Boost 1.66.0 REQUIRED COMPONENTS system program_options)
 find_package(OpenSSL 1.1.0 REQUIRED)
