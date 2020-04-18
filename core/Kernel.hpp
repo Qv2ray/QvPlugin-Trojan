@@ -5,6 +5,8 @@
 #include "utils/HttpProxy.hpp"
 
 void TrojanPluginKernelLogger(const std::string &, Log::Level);
+void TrojanPluginAddSentAmout(unsigned long);
+void TrojanPluginAddRcvdAmout(unsigned long);
 
 class TrojanKernelThread : public QThread
 {
@@ -48,7 +50,13 @@ class TrojanKernel : public Qv2rayPlugin::QvPluginKernel
     bool StopKernel() override;
     const QList<Qv2rayPlugin::QvPluginOutboundProtocolObject> KernelOutboundCapabilities() const override;
 
+  protected:
+    void timerEvent(QTimerEvent *event) override;
+
   private:
+    unsigned long lastSent;
+    unsigned long lastRcvd;
+    int statsTimerId = -1;
     Qv2rayPlugin::Utils::HttpProxy httpHelper;
     int httpPort;
     int socksPort;

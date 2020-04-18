@@ -2,11 +2,25 @@
 
 #include "Common.hpp"
 
+#include <atomic>
+
+std::atomic_ulong sentSize{};
+std::atomic_ulong rcvdSize{};
+
 TrojanKernelThread *TrojanKernelThread::self = nullptr;
 
 void TrojanPluginKernelLogger(const std::string &str, Log::Level)
 {
     TrojanKernelThread::self->OnKernelLogAvaliable_s(QString::fromStdString(str));
+}
+
+void TrojanPluginAddSentAmout(unsigned long s)
+{
+    sentSize += s;
+}
+void TrojanPluginAddRcvdAmout(unsigned long v)
+{
+    rcvdSize += v;
 }
 
 TrojanKernel::TrojanKernel(QObject *parent) : Qv2rayPlugin::QvPluginKernel(parent), thread(this)
@@ -18,6 +32,9 @@ TrojanKernel::TrojanKernel(QObject *parent) : Qv2rayPlugin::QvPluginKernel(paren
 
 bool TrojanKernel::StartKernel()
 {
+    sentSize.store(0);
+    rcvdSize.store(0);
+    statsTimerId = startTimer(1000);
     if (hasHttpConfigured)
     {
         httpHelper.httpListen(QHostAddress(httpListenAddress), httpPort, socksPort);
@@ -25,12 +42,23 @@ bool TrojanKernel::StartKernel()
     thread.start();
     return true;
 }
+
+void TrojanKernel::timerEvent(QTimerEvent *event)
+{
+    if (event->timerId() == statsTimerId)
+    {
+        emit OnKernelStatsAvailable(rcvdSize.exchange(0), sentSize.exchange(0));
+    }
+    QObject::timerEvent(event);
+}
+
 bool TrojanKernel::StopKernel()
 {
     if (hasHttpConfigured)
     {
         httpHelper.close();
     }
+    killTimer(statsTimerId);
     thread.stop();
     return true;
 }
@@ -97,6 +125,8 @@ void TrojanKernelThread::run()
         service = std::make_unique<Service>(config);
         Log::level = Log::Level::INFO;
         Log::logger = TrojanPluginKernelLogger;
+        Config::add_recv_len = TrojanPluginAddRcvdAmout;
+        Config::add_sent_len = TrojanPluginAddSentAmout;
         service->run();
     }
     catch (const std::exception &e)
