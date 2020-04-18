@@ -50,15 +50,6 @@ jobs:
         run: git submodule update --init
 # =========================================================================================================
       - name: Install Packages
-        if: matrix.platform == 'ubuntu-16.04'
-        run: | 
-          echo "Installing boost 1_72_0...";
-          wget -O boost_1_72_0.tar.gz https://sourceforge.net/projects/boost/files/boost/1.72.0/boost_1_72_0.tar.gz/download >/dev/null 2>&1;
-          tar -xf boost_1_72_0.tar.gz;
-          cd boost_1_72_0/;
-          ./bootstrap.sh --prefix=/usr/local/boost
-          sudo ./b2 link=static cxxflags=-fPIC cflags=-fPIC --with-system --with-program_options install
-      - name: Install Packages
         if: matrix.platform == 'macos-latest'
         run: |
           brew install boost openssl@1.1 zlib
@@ -93,7 +84,7 @@ jobs:
           choco install $arg openssl > openssl_installer.log
           mkdir build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -A ${{ matrix.cmakearch }}
+          cmake .. -DCMAKE_BUILD_TYPE=Release -A ${{ matrix.cmakearch }} -DBoost_USE_STATIC_LIBS=ON -DOPENSSL_USE_STATIC_LIBS=ON
           cmake --build . --parallel $(nproc) --config Release
 # --------------------------------------------------------
       - name: macOS - ${{ matrix.qt_version }} - Generate Dependencies and Build
@@ -102,16 +93,18 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DOPENSSL_LIBRARIES=/usr/local/opt/openssl@1.1/lib
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DOPENSSL_LIBRARIES=/usr/local/opt/openssl@1.1/lib -DBoost_USE_STATIC_LIBS=ON -DOPENSSL_USE_STATIC_LIBS=ON
           cmake --build . --parallel $(sysctl -n hw.logicalcpu)
 # --------------------------------------------------------
       - name: Linux - ${{ matrix.qt_version }} - Generate Dependencies and Build
         if: matrix.platform == 'ubuntu-16.04'
         shell: bash
+        env:
+          BOOST_ROOT: "/usr/local/share/boost/1.72.0"
         run: |
           mkdir build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DBoost_USE_STATIC_LIBS=ON -DOPENSSL_USE_STATIC_LIBS=ON
           cmake --build . --parallel $(nproc)
 # ========================================================================================================= Deployments
       - name: Win-${{ matrix.arch }} - ${{ matrix.qt_version }} - Uploading artifact
