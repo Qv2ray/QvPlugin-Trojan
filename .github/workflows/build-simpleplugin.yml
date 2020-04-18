@@ -99,11 +99,13 @@ jobs:
       - name: Linux - ${{ matrix.qt_version }} - Generate Dependencies and Build
         if: matrix.platform == 'ubuntu-16.04'
         shell: bash
+        env:
+          BOOST_ROOT: "/usr/local/share/boost/1.72.0"
         run: |
           mkdir build
           cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release
-          cmake --build . --parallel $(nproc) -DBOOST_ROOT=/usr/local/share/boost/1.72.0 -DBoost_USE_STATIC_LIBS=ON -DOPENSSL_USE_STATIC_LIBS=ON
+          cmake --build . --parallel $(nproc) -DBoost_USE_STATIC_LIBS=ON -DOPENSSL_USE_STATIC_LIBS=ON
 # ========================================================================================================= Deployments
       - name: Win-${{ matrix.arch }} - ${{ matrix.qt_version }} - Uploading artifact
         if: matrix.platform == 'windows-latest'
