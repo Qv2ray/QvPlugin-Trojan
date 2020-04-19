@@ -14,6 +14,8 @@ set(CMAKE_AUTORCC ON)
 find_package(Qt5 COMPONENTS Core Widgets Gui Network REQUIRED)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+add_definitions(-DTROJAN_USE_EXTERNAL_LOGGER)
+
 set(QVPLUGIN_INTERFACE_INCLUDE_DIR "interface/")
 set(QVPLUGIN_HAS_HTTP_TO_SOCKS_HELPER ON)
 include(interface/QvPluginInterface.cmake)
