@@ -103,6 +103,7 @@ jobs:
           CC: gcc-9
           CXX: gcc-9
           BOOST_ROOT: "/usr/local/share/boost/1.72.0"
+          CXXFLAGS: -fno-sized-deallocation
         run: |
           mkdir build
           cd build
