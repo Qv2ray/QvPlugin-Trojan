@@ -54,14 +54,15 @@ void TrojanKernel::timerEvent(QTimerEvent *event)
 
 bool TrojanKernel::StopKernel()
 {
+    killTimer(statsTimerId);
     if (hasHttpConfigured)
     {
         httpHelper.close();
     }
-    killTimer(statsTimerId);
     thread.stop();
     return true;
 }
+
 void TrojanKernel::SetConnectionSettings(const QString &listenAddress, const QMap<QString, int> &inbound, const QJsonObject &settings)
 {
     hasHttpConfigured = inbound.contains("http");
@@ -71,9 +72,9 @@ void TrojanKernel::SetConnectionSettings(const QString &listenAddress, const QMa
     socksPort = inbound["socks"];
     httpListenAddress = listenAddress;
     //
+    const auto o = TrojanObject::fromJson(settings);
+    //
     Config config;
-    TrojanObject o;
-    o.loadJson(settings);
     config.run_type = Config::CLIENT;
     //
     config.password[Config::SHA224(o.password.toStdString())] = o.password.toStdString();
@@ -122,11 +123,11 @@ void TrojanKernelThread::run()
 {
     try
     {
-        service = std::make_unique<Service>(config);
         Log::level = Log::Level::INFO;
         Log::logger = TrojanPluginKernelLogger;
         Config::add_recv_len = TrojanPluginAddRcvdAmout;
         Config::add_sent_len = TrojanPluginAddSentAmout;
+        service = std::make_unique<Service>(config);
         service->run();
     }
     catch (const std::exception &e)
