@@ -76,7 +76,7 @@ void TrojanKernel::SetConnectionSettings(const QString &listenAddress, const QMa
     //
     Config config;
     config.run_type = Config::CLIENT;
-    //
+    config.log_level = Log::INFO; //
     config.password[Config::SHA224(o.password.toStdString())] = o.password.toStdString();
     config.remote_addr = o.address.toStdString();
     config.remote_port = o.port;
@@ -123,10 +123,6 @@ void TrojanKernelThread::run()
 {
     try
     {
-        Log::level = Log::Level::INFO;
-        Log::logger = TrojanPluginKernelLogger;
-        Config::add_recv_len = TrojanPluginAddRcvdAmout;
-        Config::add_sent_len = TrojanPluginAddSentAmout;
         service = std::make_unique<Service>(config);
         service->run();
     }

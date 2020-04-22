@@ -14,6 +14,9 @@ class TrojanKernelThread : public QThread
   public:
     TrojanKernelThread(QObject *parent = nullptr) : QThread(parent)
     {
+        Log::logger = TrojanPluginKernelLogger;
+        Config::add_recv_len = TrojanPluginAddRcvdAmout;
+        Config::add_sent_len = TrojanPluginAddSentAmout;
         self = this;
     };
     ~TrojanKernelThread();
