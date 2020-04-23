@@ -84,7 +84,7 @@ jobs:
           choco install $arg openssl > openssl_installer.log
           mkdir build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -A ${{ matrix.cmakearch }} -DBoost_USE_STATIC_LIBS=ON
+          cmake .. -DCMAKE_BUILD_TYPE=Release -A ${{ matrix.cmakearch }} -DBoost_USE_STATIC_LIBS=ON -DBoost_INCLUDE_DIR="${BOOST_ROOT_1_72_0}/include"
           cmake --build . --parallel $(nproc) --config Release
 # --------------------------------------------------------
       - name: macOS - ${{ matrix.qt_version }} - Generate Dependencies and Build
