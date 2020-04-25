@@ -3,4 +3,4 @@
 	url = https://github.com/Qv2ray/QvPlugin-Interface/
 [submodule "trojan"]
 	path = trojan
-	url = https://github.com/trojan-gfw/trojan
+	url = https://github.com/Qv2ray/trojan
