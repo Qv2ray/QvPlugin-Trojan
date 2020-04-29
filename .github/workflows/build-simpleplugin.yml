@@ -107,7 +107,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DBoost_USE_STATIC_LIBS=ON
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DBoost_USE_STATIC_LIBS=ON -DFORCE_TCP_FASTOPEN=ON
           cmake --build . --parallel $(nproc)
 # ========================================================================================================= Deployments
       - name: Win-${{ matrix.arch }} - ${{ matrix.qt_version }} - Uploading artifact
