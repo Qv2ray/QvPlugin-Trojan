@@ -6,9 +6,9 @@
 #include <QLabel>
 #include <QMetaEnum>
 
-std::shared_ptr<QvPluginKernel> TrojanPlugin::GetKernel()
+std::unique_ptr<QvPluginKernel> TrojanPlugin::CreateKernel()
 {
-    return kernel;
+    return std::make_unique<TrojanKernel>();
 }
 
 bool TrojanPlugin::UpdateSettings(const QJsonObject &conf)
@@ -22,7 +22,6 @@ bool TrojanPlugin::Initialize(const QString &, const QJsonObject &settings)
     this->settings = settings;
     serializer = std::make_shared<TrojanSerializer>(this);
     eventHandler = std::make_shared<TrojanEventHandler>(this);
-    kernel = std::make_shared<TrojanKernel>(this);
     return true;
 }
 
