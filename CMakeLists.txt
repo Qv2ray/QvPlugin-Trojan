@@ -93,3 +93,5 @@ target_link_libraries(${PROJECT_NAME}
     ${CMAKE_THREAD_LIBS_INIT}
     ${OPENSSL_LIBRARIES}
     ${Boost_LIBRARIES})
+
+install(TARGETS ${PROJECT_NAME} DESTINATION share/qv2ray/plugins)
