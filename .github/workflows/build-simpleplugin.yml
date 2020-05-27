@@ -91,6 +91,7 @@ jobs:
         shell: bash
         if: matrix.platform == 'macos-latest'
         run: |
+          sudo xcode-select -s "/Applications/Xcode_10.3.app"
           mkdir build
           cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@1.1 -DOPENSSL_LIBRARIES=/usr/local/opt/openssl@1.1/lib -DBoost_USE_STATIC_LIBS=ON -DOPENSSL_USE_STATIC_LIBS=ON -DMACOSX_DEPLOYMENT_TARGET=10.13
