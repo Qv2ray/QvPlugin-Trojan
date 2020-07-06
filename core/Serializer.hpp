@@ -47,20 +47,24 @@ class TrojanSerializer : public Qv2rayPlugin::QvPluginSerializer
         const auto trueList = QStringList{ "true", "1", "yes", "y" };
         const QUrl trojanUrl(link);
         const QUrlQuery query(trojanUrl.query());
-        *alias = trojanUrl.fragment();
+        *alias = trojanUrl.fragment(QUrl::FullyDecoded);
+
+        auto getQueryValue = [&](const QString &key) {
+            return query.queryItemValue(key, QUrl::FullyDecoded);
+        };
         //
         TrojanObject result;
         result.address = trojanUrl.host();
         result.password = trojanUrl.userName();
         result.port = trojanUrl.port();
-        result.sni = query.queryItemValue("sni");
+        result.sni = getQueryValue("sni");
         //
-        result.tcpFastOpen = trueList.contains(query.queryItemValue("tfo").toLower());
-        result.sessionTicket = trueList.contains(query.queryItemValue("sessionTicket").toLower());
+        result.tcpFastOpen = trueList.contains(getQueryValue("tfo").toLower());
+        result.sessionTicket = trueList.contains(getQueryValue("sessionTicket").toLower());
         //
-        bool allowAllInsecure = trueList.contains(query.queryItemValue("allowInsecure").toLower());
-        result.ignoreHostname = allowAllInsecure || trueList.contains(query.queryItemValue("allowInsecureHostname").toLower());
-        result.ignoreCertificate = allowAllInsecure || trueList.contains(query.queryItemValue("allowInsecureCertificate").toLower());
+        bool allowAllInsecure = trueList.contains(getQueryValue("allowInsecure").toLower());
+        result.ignoreHostname = allowAllInsecure || trueList.contains(getQueryValue("allowInsecureHostname").toLower());
+        result.ignoreCertificate = allowAllInsecure || trueList.contains(getQueryValue("allowInsecureCertificate").toLower());
         //
         return { "trojan", result.toJson() };
     }
