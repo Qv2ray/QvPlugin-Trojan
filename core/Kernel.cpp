@@ -41,6 +41,7 @@ bool TrojanKernel::StartKernel()
     if (socksPort == 0 && httpPort == 0)
     {
         emit OnKernelCrashed("Both HTTP and SOCKS inbounds are disabled.");
+        return false;
     }
     if (socksPort == 0)
     {
