@@ -23,19 +23,21 @@ class TrojanPlugin
     // Basic metainfo of this plugin
     const QvPluginMetadata GetMetadata() const override
     {
-        return QvPluginMetadata{
-            "Trojan Plugin",                      //
-            "Qv2ray Workgroup",                   //
-            "qvtrojan_plugin",                    //
-            "Connect to Trojan server in Qv2ray", //
-            QIcon(":/assets/logo.png"),           //
-            {},                                   //
-            { SPECIAL_TYPE_KERNEL,                //
-              SPECIAL_TYPE_SERIALIZOR }           //
+        auto x = QvPluginMetadata{
+            "Trojan-GFW Plugin",                                                       //
+            "Qv2ray Workgroup",                                                        //
+            "qvtrojan_plugin",                                                         //
+            "Connect to Trojan server in Qv2ray, conflicts with the Trojan-Go plugin", //
+            QIcon(":/assets/logo.png"),                                                //
+            {},                                                                        //
+            { SPECIAL_TYPE_KERNEL,                                                     //
+              SPECIAL_TYPE_SERIALIZOR }                                                //
         };
+        x.KernelOutboundCapabilities = { { "Trojan", "trojan" } };
+        return x;
     }
     //
-    std::shared_ptr<QvPluginKernel> GetKernel() override;
+    std::unique_ptr<QvPluginKernel> CreateKernel() override;
     std::shared_ptr<QvPluginSerializer> GetSerializer() override;
     std::shared_ptr<QvPluginEventHandler> GetEventHandler() override;
     std::unique_ptr<QvPluginEditor> GetEditorWidget(UI_TYPE) override;
@@ -53,5 +55,4 @@ class TrojanPlugin
     QJsonObject settings;
     std::shared_ptr<TrojanSerializer> serializer;
     std::shared_ptr<TrojanEventHandler> eventHandler;
-    std::shared_ptr<TrojanKernel> kernel;
 };
