@@ -24,14 +24,14 @@ class TrojanPlugin
     const QvPluginMetadata GetMetadata() const override
     {
         auto x = QvPluginMetadata{
-            "Trojan-GFW Plugin",                                                       //
-            "Qv2ray Workgroup",                                                        //
-            "qvtrojan_plugin",                                                         //
-            "Connect to Trojan server in Qv2ray, conflicts with the Trojan-Go plugin", //
-            QIcon(":/assets/logo.png"),                                                //
-            {},                                                                        //
-            { SPECIAL_TYPE_KERNEL,                                                     //
-              SPECIAL_TYPE_SERIALIZOR }                                                //
+            "Trojan-GFW Plugin",                  //
+            "Qv2ray Workgroup",                   //
+            "qvtrojan_plugin",                    //
+            "Connect to Trojan server in Qv2ray", //
+            QIcon(":/assets/logo.png"),           //
+            {},                                   //
+            { SPECIAL_TYPE_KERNEL,                //
+              SPECIAL_TYPE_SERIALIZOR }           //
         };
         x.KernelOutboundCapabilities = { { "Trojan", "trojan" } };
         return x;
