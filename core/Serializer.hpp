@@ -45,7 +45,7 @@ class TrojanSerializer : public Qv2rayPlugin::QvPluginSerializer
         }
         //
         const auto trueList = QStringList{ "true", "1", "yes", "y" };
-        const QUrl trojanUrl(link);
+        const QUrl trojanUrl(link.trimmed());
         const QUrlQuery query(trojanUrl.query());
         *alias = trojanUrl.fragment(QUrl::FullyDecoded);
 
