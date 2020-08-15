@@ -1,11 +1,13 @@
 #include "Kernel.hpp"
 
+#include <QTimerEvent>
 #include <atomic>
 
 std::atomic_ulong sentSize{};
 std::atomic_ulong rcvdSize{};
-
 TrojanKernelThread *TrojanKernelThread::self = nullptr;
+
+using namespace Qv2rayPlugin;
 
 void TrojanPluginKernelLogger(const std::string &str, Log::Level)
 {
@@ -21,14 +23,14 @@ void TrojanPluginAddRcvdAmout(unsigned long v)
     rcvdSize += v;
 }
 
-TrojanKernel::TrojanKernel(QObject *parent) : Qv2rayPlugin::QvPluginKernel(parent), thread(this)
+TrojanKernel::TrojanKernel() : Qv2rayPlugin::PluginKernel(), thread(this)
 {
     connect(&thread, &TrojanKernelThread::OnKernelCrashed_s, this, &TrojanKernel::OnKernelCrashed);
     connect(&thread, &TrojanKernelThread::OnKernelLogAvailable_s, this, &TrojanKernel::OnKernelLogAvailable);
     connect(&thread, &TrojanKernelThread::OnKernelStatsAvailable_s, this, &TrojanKernel::OnKernelStatsAvailable);
 }
 
-void TrojanKernel::SetConnectionSettings(const QMap<KernelSetting, QVariant> &options, const QJsonObject &settings)
+void TrojanKernel::SetConnectionSettings(const QMap<KernelOptionFlags, QVariant> &options, const QJsonObject &settings)
 {
     httpPort = options[KERNEL_HTTP_ENABLED].toBool() ? options[KERNEL_HTTP_PORT].toInt() : 0;
     socksPort = options[KERNEL_SOCKS_ENABLED].toBool() ? options[KERNEL_SOCKS_PORT].toInt() : 0;

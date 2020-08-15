@@ -12,7 +12,7 @@ TrojanOutboundEditor::~TrojanOutboundEditor()
     delete ui;
 }
 
-void TrojanOutboundEditor::SetHostInfo(const QString &address, int port)
+void TrojanOutboundEditor::SetHostAddress(const QString &address, int port)
 {
     trojan.address = address;
     trojan.port = port;

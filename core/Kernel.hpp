@@ -4,6 +4,9 @@
 #include "trojan/src/core/config.h"
 #include "trojan/src/core/service.h"
 #include "utils/HttpProxy.hpp"
+
+#include <QThread>
+
 void TrojanPluginKernelLogger(const std::string &, Log::Level);
 void TrojanPluginAddSentAmout(unsigned long);
 void TrojanPluginAddRcvdAmout(unsigned long);
@@ -46,13 +49,13 @@ class TrojanKernelThread : public QThread
     int listenPort;
 };
 
-class TrojanKernel : public Qv2rayPlugin::QvPluginKernel
+class TrojanKernel : public Qv2rayPlugin::PluginKernel
 {
     Q_OBJECT
   public:
-    explicit TrojanKernel(QObject *parent = nullptr);
+    explicit TrojanKernel();
     ~TrojanKernel();
-    void SetConnectionSettings(const QMap<KernelSetting, QVariant> &options, const QJsonObject &settings) override;
+    void SetConnectionSettings(const QMap<Qv2rayPlugin::KernelOptionFlags, QVariant> &options, const QJsonObject &settings) override;
     bool StartKernel() override;
     bool StopKernel() override;
 
@@ -69,4 +72,17 @@ class TrojanKernel : public Qv2rayPlugin::QvPluginKernel
     int socksPort;
     QString listenAddress;
     TrojanKernelThread thread;
+};
+
+class KernelInterface : public Qv2rayPlugin::PluginKernelInterface
+{
+  public:
+    virtual std::unique_ptr<Qv2rayPlugin::PluginKernel> CreateKernel() const override
+    {
+        return std::make_unique<TrojanKernel>();
+    }
+    virtual QList<QString> GetKernelProtocols() const override
+    {
+        return { "trojan" };
+    }
 };
