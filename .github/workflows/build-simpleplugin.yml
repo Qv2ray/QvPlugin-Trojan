@@ -38,7 +38,7 @@ jobs:
       - name: Get Plugin Name
         id: get_name
         shell: bash
-        run: echo ::set-output name=NAME::QvTrojanPlugin
+        run: echo ::set-output name=NAME::QvPlugin-Trojan
       - name: Checking out sources
         uses: actions/checkout@master
       - name: Install Python 3.7 version
