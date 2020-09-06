@@ -4,20 +4,19 @@
 
 #include <QObject>
 #include <QUrl>
+#include <QUrlQuery>
 
-class TrojanSerializer : public Qv2rayPlugin::QvPluginSerializer
+using namespace Qv2rayPlugin;
+
+class TrojanOutboundHandler : public Qv2rayPlugin::PluginOutboundHandler
 {
-    Q_OBJECT
   public:
-    explicit TrojanSerializer(QObject *parent = nullptr) : QvPluginSerializer(parent){};
-    const QString SerializeOutbound(const QString &protocol,  //
-                                    const QString &alias,     //
-                                    const QString &groupName, //
-                                    const QJsonObject &object) const override
+    explicit TrojanOutboundHandler() : PluginOutboundHandler(){};
+    const QString SerializeOutbound(const QString &protocol, const QString &name, const QString &group, const QJsonObject &object) const override
     {
         if (protocol == "trojan")
         {
-            Q_UNUSED(groupName)
+            Q_UNUSED(group)
             TrojanObject o = TrojanObject::fromJson(object);
             QString trojanUri = o.password.toLocal8Bit().toPercentEncoding() +                                      //
                                 "@" + o.address +                                                                   //
@@ -27,14 +26,12 @@ class TrojanSerializer : public Qv2rayPlugin::QvPluginSerializer
                                 "&allowInsecureCertificate=" + QString::number(int(o.ignoreCertificate)) +          //
                                 "&sessionTicket=" + QString::number(int(o.sessionTicket)) +                         //
                                 "&tfo=" + QString::number(o.tcpFastOpen) +                                          //
-                                "#" + QUrl::toPercentEncoding(alias.toUtf8());
+                                "#" + QUrl::toPercentEncoding(name.toUtf8());
             return "trojan://" + trojanUri;
         }
-        else
-        {
-            return "";
-        }
+        return "";
     }
+
     const QPair<QString, QJsonObject> DeserializeOutbound(const QString &link, QString *alias, QString *errorMessage) const override
     {
         const QString prefix = "trojan://";
@@ -68,23 +65,26 @@ class TrojanSerializer : public Qv2rayPlugin::QvPluginSerializer
         //
         return { "trojan", result.toJson() };
     }
-    const Qv2rayPlugin::QvPluginOutboundInfoObject GetOutboundInfo(const QString &protocol, const QJsonObject &outbound) const override
+
+    const Qv2rayPlugin::OutboundInfoObject GetOutboundInfo(const QString &protocol, const QJsonObject &outbound) const override
     {
         if (protocol == "trojan")
         {
             auto o = TrojanObject::fromJson(outbound);
-            return Qv2rayPlugin::QvPluginOutboundInfoObject{ o.address, "trojan", o.port };
+            return { { INFO_SERVER, o.address },
+                     { INFO_PROTOCOL, "trojan" },
+                     { INFO_PORT, o.port },
+                     { INFO_SNI, o.sni.isEmpty() ? o.address : o.sni } };
         }
-        else
-        {
-            return {};
-        }
+        return {};
     }
-    const QList<QString> ShareLinkPrefixes() const override
+
+    const QList<QString> SupportedLinkPrefixes() const override
     {
         return { "trojan://" };
     }
-    const QList<QString> OutboundProtocols() const override
+
+    const QList<QString> SupportedProtocols() const override
     {
         return { "trojan" };
     }

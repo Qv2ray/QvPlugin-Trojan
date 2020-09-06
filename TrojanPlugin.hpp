@@ -8,7 +8,6 @@
 #include <QObject>
 #include <QtPlugin>
 
-class QLabel;
 using namespace Qv2rayPlugin;
 
 class TrojanPlugin
@@ -23,36 +22,24 @@ class TrojanPlugin
     // Basic metainfo of this plugin
     const QvPluginMetadata GetMetadata() const override
     {
-        auto x = QvPluginMetadata{
+        return QvPluginMetadata{
             "Trojan-GFW Plugin",                  //
             "Qv2ray Workgroup",                   //
             "qvtrojan_plugin",                    //
             "Connect to Trojan server in Qv2ray", //
-            QIcon(":/assets/logo.png"),           //
-            {},                                   //
-            { SPECIAL_TYPE_KERNEL,                //
-              SPECIAL_TYPE_SERIALIZOR }           //
+            "v3.0.0",                             //
+            "Qv2ray/QvPlugin-Trojan",             //
+            {
+                COMPONENT_GUI,             //
+                COMPONENT_KERNEL,          //
+                COMPONENT_OUTBOUND_HANDLER //
+            },                             //
+            UPDATE_GITHUB_RELEASE          //
         };
-        x.KernelOutboundCapabilities = { { "Trojan", "trojan" } };
-        return x;
     }
-    //
-    std::unique_ptr<QvPluginKernel> CreateKernel() override;
-    std::shared_ptr<QvPluginSerializer> GetSerializer() override;
-    std::shared_ptr<QvPluginEventHandler> GetEventHandler() override;
-    std::unique_ptr<QvPluginEditor> GetEditorWidget(UI_TYPE) override;
-    std::unique_ptr<QWidget> GetSettingsWidget() override;
-    //
-    bool UpdateSettings(const QJsonObject &) override;
-    bool Initialize(const QString &, const QJsonObject &) override;
-    const QJsonObject GetSettngs() override;
-    //
+    bool InitializePlugin(const QString &, const QJsonObject &) override;
+
   signals:
     void PluginLog(const QString &) const override;
-    void PluginErrorMessageBox(const QString &) const override;
-
-  private:
-    QJsonObject settings;
-    std::shared_ptr<TrojanSerializer> serializer;
-    std::shared_ptr<TrojanEventHandler> eventHandler;
+    void PluginErrorMessageBox(const QString &, const QString &) const override;
 };
