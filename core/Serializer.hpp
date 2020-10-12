@@ -12,22 +12,36 @@ class TrojanOutboundHandler : public Qv2rayPlugin::PluginOutboundHandler
 {
   public:
     explicit TrojanOutboundHandler() : PluginOutboundHandler(){};
-    const QString SerializeOutbound(const QString &protocol, const QString &name, const QString &group, const QJsonObject &object) const override
+    const QString SerializeOutbound(const QString &protocol, const QString &name, const QString &group, const QJsonObject &object,
+                                    const QJsonObject &) const override
     {
         if (protocol == "trojan")
         {
             Q_UNUSED(group)
             TrojanObject o = TrojanObject::fromJson(object);
-            QString trojanUri = o.password.toLocal8Bit().toPercentEncoding() +                                      //
-                                "@" + o.address +                                                                   //
-                                ":" + QString::number(o.port) +                                                     //
-                                "?allowInsecure=" + QString::number(int(o.ignoreHostname || o.ignoreCertificate)) + //
-                                "&allowInsecureHostname=" + QString::number(int(o.ignoreHostname)) +                //
-                                "&allowInsecureCertificate=" + QString::number(int(o.ignoreCertificate)) +          //
-                                "&sessionTicket=" + QString::number(int(o.sessionTicket)) +                         //
-                                "&tfo=" + QString::number(o.tcpFastOpen) +                                          //
-                                "#" + QUrl::toPercentEncoding(name.toUtf8());
-            return "trojan://" + trojanUri;
+
+            QUrlQuery query;
+            if (o.ignoreHostname)
+                query.addQueryItem("allowInsecureHostname", "1");
+            if (o.ignoreCertificate)
+                query.addQueryItem("allowInsecureCertificate", "1");
+            if (o.sessionTicket)
+                query.addQueryItem("sessionTicket", "1");
+            if (o.ignoreCertificate || o.ignoreHostname)
+                query.addQueryItem("allowInsecure", "1");
+            if (o.tcpFastOpen)
+                query.addQueryItem("tfo", "1");
+
+            QUrl link;
+            if (!o.password.isEmpty())
+                link.setPassword(o.password);
+            link.setPort(o.port);
+            link.setHost(o.address);
+            link.setFragment(name);
+            link.setQuery(query);
+            link.setScheme("trojan");
+
+            return link.toString(QUrl::FullyEncoded);
         }
         return "";
     }
@@ -77,6 +91,18 @@ class TrojanOutboundHandler : public Qv2rayPlugin::PluginOutboundHandler
                      { INFO_SNI, o.sni.isEmpty() ? o.address : o.sni } };
         }
         return {};
+    }
+
+    const void SetOutboundInfo(const QString &protocol, const OutboundInfoObject &info, QJsonObject &outbound) const override
+    {
+        if (protocol != "trojan")
+            return;
+        if (info.contains(INFO_SERVER))
+            outbound["address"] = info[INFO_SERVER].toString();
+        if (info.contains(INFO_PORT))
+            outbound["port"] = info[INFO_PORT].toInt();
+        if (info.contains(INFO_SNI))
+            outbound["sni"] = info[INFO_SNI].toString();
     }
 
     const QList<QString> SupportedLinkPrefixes() const override
