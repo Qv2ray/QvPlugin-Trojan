@@ -58,6 +58,10 @@ class TrojanKernel : public Qv2rayPlugin::PluginKernel
     void SetConnectionSettings(const QMap<Qv2rayPlugin::KernelOptionFlags, QVariant> &options, const QJsonObject &settings) override;
     bool StartKernel() override;
     bool StopKernel() override;
+    QString GetKernelName() const override
+    {
+        return "Trojan";
+    }
 
   protected:
     void timerEvent(QTimerEvent *event) override;
