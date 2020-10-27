@@ -18,7 +18,7 @@ class TrojanOutboundHandler : public Qv2rayPlugin::PluginOutboundHandler
         if (protocol == "trojan")
         {
             Q_UNUSED(group)
-            TrojanObject o = TrojanObject::fromJson(object);
+            const auto o = TrojanObject::fromJson(object);
 
             QUrlQuery query;
             if (o.ignoreHostname)
@@ -32,9 +32,12 @@ class TrojanOutboundHandler : public Qv2rayPlugin::PluginOutboundHandler
             if (o.tcpFastOpen)
                 query.addQueryItem("tfo", "1");
 
+            if (!o.sni.isEmpty())
+                query.addQueryItem("sni", o.sni);
+
             QUrl link;
             if (!o.password.isEmpty())
-                link.setPassword(o.password);
+                link.setUserInfo(o.password);
             link.setPort(o.port);
             link.setHost(o.address);
             link.setFragment(name);
