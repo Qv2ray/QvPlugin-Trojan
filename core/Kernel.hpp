@@ -21,7 +21,8 @@ class TrojanKernelThread : public QThread
         Config::add_recv_len = TrojanPluginAddRcvdAmout;
         Config::add_sent_len = TrojanPluginAddSentAmout;
         self = this;
-    };
+    }
+
     ~TrojanKernelThread();
     void stop();
     static TrojanKernelThread *self;
