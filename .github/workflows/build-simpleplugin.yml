@@ -29,7 +29,8 @@ jobs:
       fail-fast: false
         
     runs-on: ${{ matrix.platform }}
-    
+    env:
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     steps:
       - name: Get the version
         id: get_version
