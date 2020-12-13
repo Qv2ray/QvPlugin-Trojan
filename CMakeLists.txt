@@ -11,7 +11,14 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt5 COMPONENTS Core Widgets Gui Network REQUIRED)
+option(QVPLUGIN_USE_QT6 "Use Qt6")
+if(QVPLUGIN_USE_QT6)
+    set(QV_QT_LIBNAME Qt6)
+else()
+    set(QV_QT_LIBNAME Qt5)
+endif()
+find_package(${QV_QT_LIBNAME} COMPONENTS Core Widgets Gui Network REQUIRED)
+
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 add_definitions(-DTROJAN_USE_EXTERNAL_LOGGER)
@@ -89,10 +96,10 @@ if(APPLE)
 endif()
 
 target_link_libraries(${PROJECT_NAME}
-    Qt5::Core
-    Qt5::Gui
-    Qt5::Widgets
-    Qt5::Network
+    ${QV_QT_LIBNAME}::Core
+    ${QV_QT_LIBNAME}::Gui
+    ${QV_QT_LIBNAME}::Widgets
+    ${QV_QT_LIBNAME}::Network
     ${CMAKE_THREAD_LIBS_INIT}
     ${OPENSSL_LIBRARIES}
     ${Boost_LIBRARIES})
