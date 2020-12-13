@@ -78,8 +78,7 @@ jobs:
           CC: cl.exe
           CXX: cl.exe
         run: |
-          [[ ${{ matrix.arch }} == "x86" ]] && arg="--forcex86" || arg=""
-          choco install $arg openssl > openssl_installer.log
+          choco install openssl > openssl_installer.log
           mkdir build
           cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release -A x64 -DQVPLUGIN_USE_QT6=ON -DBoost_USE_STATIC_LIBS=ON -DBoost_INCLUDE_DIR="${BOOST_ROOT_1_72_0}/include"
