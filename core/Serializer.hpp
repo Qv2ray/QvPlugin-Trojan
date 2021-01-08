@@ -69,7 +69,7 @@ class TrojanOutboundHandler : public Qv2rayPlugin::PluginOutboundHandler
         //
         TrojanObject result;
         result.address = trojanUrl.host();
-        result.password = trojanUrl.userName();
+        result.password = QUrl::fromPercentEncoding(trojanUrl.userInfo().toUtf8());
         result.port = trojanUrl.port();
         result.sni = getQueryValue("sni");
         //
