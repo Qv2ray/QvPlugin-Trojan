@@ -37,7 +37,7 @@ class TrojanOutboundHandler : public Qv2rayPlugin::PluginOutboundHandler
 
             QUrl link;
             if (!o.password.isEmpty())
-                link.setUserInfo(o.password);
+                link.setUserName(o.password, QUrl::DecodedMode);
             link.setPort(o.port);
             link.setHost(o.address);
             link.setFragment(name);
