@@ -72,14 +72,20 @@ class TrojanOutboundHandler : public Qv2rayPlugin::PluginOutboundHandler
         result.password = QUrl::fromPercentEncoding(trojanUrl.userInfo().toUtf8());
         result.port = trojanUrl.port();
         // process sni (and also "peer")
-        if (const auto hasSNI = query.hasQueryItem("sni"); hasSNI)
+        if (query.hasQueryItem("sni"))
         {
             result.sni = getQueryValue("sni");
         }
-        else if (const auto hasPeer = query.hasQueryItem("peer"); !hasSNI && hasPeer)
+        else if (query.hasQueryItem("peer"))
         {
+            // This is evil and may be removed in a future version.
             qWarning() << "use of 'peer' in trojan url is deprecated";
             result.sni = getQueryValue("peer");
+        }
+        else
+        {
+            // Use the hostname
+            result.sni = result.address
         }
         //
         result.tcpFastOpen = trueList.contains(getQueryValue("tfo").toLower());
