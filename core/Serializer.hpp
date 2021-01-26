@@ -71,7 +71,8 @@ class TrojanOutboundHandler : public Qv2rayPlugin::PluginOutboundHandler
         result.address = trojanUrl.host();
         result.password = QUrl::fromPercentEncoding(trojanUrl.userInfo().toUtf8());
         result.port = trojanUrl.port();
-        result.sni = trojanUrl.hasQuery("sni") ? getQueryValue("sni") : trojanUrl.hasQuery("peer") ? getQueryValue("peer") : "";//peer has been used
+        result.sni = trojanUrl.hasQuery("sni") ? getQueryValue("sni") : trojanUrl.hasQuery("peer") ? getQueryValue("peer") : "";
+        qDebug("我们已支持被废弃的peer")
         //
         result.tcpFastOpen = trueList.contains(getQueryValue("tfo").toLower());
         result.sessionTicket = trueList.contains(getQueryValue("sessionTicket").toLower());
