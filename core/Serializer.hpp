@@ -85,7 +85,7 @@ class TrojanOutboundHandler : public Qv2rayPlugin::PluginOutboundHandler
         else
         {
             // Use the hostname
-            result.sni = result.address
+            result.sni = result.address;
         }
         //
         result.tcpFastOpen = trueList.contains(getQueryValue("tfo").toLower());
